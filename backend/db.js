@@ -1,6 +1,7 @@
 import pg from "pg";
+import dotenv from "dotenv";
+dotenv.config();
 const { Client } = pg;
-
 const connectToDataBase = async () => {
   const client = new Client({
     user: process.env.POSTGRES_USER,

@@ -16,7 +16,7 @@ export default function Home() {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
 
-  return (
-  <div> this is home</div>
-  );
+  return(
+    <dev>This is Home</dev>
+  )
 }

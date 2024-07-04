@@ -1,16 +1,40 @@
 "use client";
 import { useState } from "react";
-export default function LogIn() {
+// import { useRouter } from "next/router";
+export default function LogIn(props) {
+  // const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState();
   const [credentials, setCredentials] = useState({
     id: "",
     username: "",
     name: "",
     password: "",
   });
-  const handleSubmit = () => {
-    console.log("submetted", credentials);
+  const handleSubmit = async e => {
+    e.preventDefault();
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/createUser", {
+        method: "POST",
+        header: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: credentials.username,
+          email: credentials.email,
+          password: credentials.password,
+        }),
+      });
+      if (response.ok) {
+        const json = await response.json();
+        // router.push("/home");
+      } else {
+        const ErrorData = await response.json();
+        setErrorMessage(ErrorData.message || "Login Failed ");
+        console.log(errorMessage);
+      }
+    } catch (error) {}
   };
-  const onChange = () => {
+  const onChange = (e) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
   return (
@@ -33,9 +57,9 @@ export default function LogIn() {
                       <input
                         type="number"
                         value={credentials.id}
-                        onChange={onChange}
                         className="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[twe-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-white dark:placeholder:text-neutral-300 dark:autofill:shadow-autofill dark:peer-focus:text-primary [&:not([data-twe-input-placeholder-active])]:placeholder:opacity-0"
                         id="id"
+                        onChange={onChange}
                         name="id"
                         placeholder="ID"
                       />
