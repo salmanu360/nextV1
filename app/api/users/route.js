@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
-// import next from "next";
 const prisma = new PrismaClient();
 export function GET() {
   const getusers = [
@@ -21,9 +20,14 @@ export function GET() {
 //=-----------
 
 export async function POST(request) {
-  const { username, email, password } = request.body;
   try {
-    let user = await prisma.user.findFirst({
+    const body = await request.json();
+    const { username, email, password } = body;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    let userExist = false;
+    // console.log("this is the request body", body);
+    let checkuser = await prisma.user.findFirst({
       where: {
         OR: [
           {
@@ -33,23 +37,34 @@ export async function POST(request) {
         ],
       },
     });
-    if (user) {
-      return NextResponse.json({
-        message: "User with same credientials exist",
-      });
+    if (checkuser) {
+      userExist = true;
+      return NextResponse.json(
+        {
+          userExist,
+          message: "User already created",
+        },
+        { status: 201 },
+      );
     }
-    const hashedPassword = await bcrypt.hash(password, 10);
-    user = await prisma.user.create({
+
+    let user = await prisma.user.create({
       data: {
         username: username,
         email: email,
         password: hashedPassword,
       },
     });
-    NextResponse.json("user created with the following credientisls", user);
+    return NextResponse.json(
+      {
+        message: "the user is created with the credientils",
+        user,
+      },
+      { status: 200 },
+    );
   } catch (error) {
     console.log(error);
-    NextResponse.json({ message: "Server error" });
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
 
