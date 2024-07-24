@@ -3,8 +3,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAppContext } from "@/context/userState";
-export default function SignIn(props) {
-  const { setUsers, users } = useAppContext();
+import { login } from "@/services/userServices";
+import { toast } from "react-toastify";
+const SignIn = () => {
+  const { setUsers } = useAppContext();
   const router = useRouter();
   const [emailError, setEmailError] = useState("");
   const [credentials, setCredentials] = useState({
@@ -14,32 +16,21 @@ export default function SignIn(props) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const response = await fetch("http://localhost:3000/api/signIn", {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify({
-          email: credentials.email,
-          password: credentials.password,
-        }),
-      });
-      const data = await response.json();
-      const { user } = data;
-      if (data.success) {
-        setUsers(user);
-        localStorage.setItem("token", data.authToken);
+      const result = await login(credentials);
+      if (result.success) {
+        setUsers(result.user);
+        toast.success("Logged In");
         router.push("/home");
       }
     } catch (error) {
       console.error(error);
+      toast.error("An error occurred");
     }
   };
   const onChange = (e) => {
-    setCredentials({ ...credentials, [e.target.name]: e.target.value });
-    const { name, value } = e.target.value;
+    const { name, value } = e.target;
+    setCredentials({ ...credentials, [name]: value });
     if (name === "email") {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(value)) {
@@ -142,6 +133,8 @@ export default function SignIn(props) {
         </div>
       </div>
       {/* </section> */}
+      {/* {userData && <DashBoard user={userData} />}{" "} */}
     </div>
   );
-}
+};
+export default SignIn;

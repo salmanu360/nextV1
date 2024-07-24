@@ -1,9 +1,7 @@
 "use client";
-
-import SignIn from "@/components/SignIn";
-
+import SignIn from "./SignIn";
 const page = () => {
-  return <SignIn/>
+  return <SignIn />;
 };
 
 export default page;

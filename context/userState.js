@@ -1,14 +1,24 @@
 "use client";
-import { createContext, useState, useContext } from "react";
+import { currentUser } from "@/services/userServices";
+import { createContext, useState, useContext, useEffect } from "react";
 const AppContext = createContext();
-const ContextProvider = (props) => {
-  const [users, setUsers] = useState({
-    id: "",
-    email: "",
-  });
+const ContextProvider = ({ children }) => {
+  const [users, setUsers] = useState(undefined);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const tempUser = await currentUser();
+        setUsers({ ...tempUser });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    load();
+  }, []);
   return (
     <AppContext.Provider value={{ users, setUsers }}>
-      {props.children}
+      {children}
     </AppContext.Provider>
   );
 };

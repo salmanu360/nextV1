@@ -1,60 +1,40 @@
 "use client";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-// import { useAppContext } from "@/context/userState";
-export default function SignUp(props) {
-  // const { setUsers, users } = useAppContext();
+import { signUp } from "@/services/userServices";
+import { useAppContext } from "@/context/userState";
+export default function SignUp() {
   const router = useRouter();
+  const { setUsers } = useAppContext();
   const [userIsThere, setUserIsThere] = useState(false);
   const [passError, setPassError] = useState("");
   const [emailError, setEmailError] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
   const [credentials, setCredentials] = useState({
     username: "",
     email: "",
     password: "",
   });
 
-  const handleSubmit = async (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3000/api/signUp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: credentials.username,
-          email: credentials.email,
-          password: credentials.password,
-        }),
-      });
-      const data = await response.json();
-      const { message, user } = data;
-
-      if (response.ok) {
-        console.log("Successful registration", data);
-      } else {
-        setErrorMessage(data.message || "Login Failed");
-        console.log(errorMessage);
-      }
+      const result = await signUp(credentials);
+      const { message } = result;
       if (message === "User already created") {
         setUserIsThere(true);
-        console.log("User exists", userIsThere);
-      } else {
-        setUserIsThere(false);
-        // setUsers(user);
       }
+      console.log("Successful registration", result);
+      setUserIsThere(false);
+      router.push("/signIn");
     } catch (error) {
       console.error("Error:", error);
     }
   };
 
   const onChange = (e) => {
-    setCredentials({ ...credentials, [e.target.name]: e.target.value });
     const { name, value } = e.target;
-
+    setCredentials({ ...credentials, [name]: value });
     if (name === "email") {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; //regular expression used to check the email formate
       if (!emailRegex.test(value)) {
@@ -86,7 +66,7 @@ export default function SignUp(props) {
                   </h4>
                 </div>
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSignUp}>
                   {/* User name */}
                   <div className="relative mb-4" data-twe-input-wrapper-init>
                     <input
