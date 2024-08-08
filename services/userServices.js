@@ -21,8 +21,10 @@ export async function logOut() {
   return result;
 }
 export async function currentUser() {
-  const result = await axios
-    .get(`${path}/currentUser`)
-    .then((response) => response.data);
+  // const result = await axios
+  //   .get(`${path}/currentUser`)
+  //   .then((response) => response.data);
+  // return result;
+  const result = { name: "huzaifa" };
   return result;
 }

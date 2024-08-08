@@ -2,6 +2,7 @@
 "use client";
 import { useAppContext } from "@/context/userState";
 import { logOut } from "@/services/userServices";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -28,18 +29,30 @@ const Navbar = () => {
 
   return (
     <div>
-      <div className="navbar bg-base-100">
+      <div className="navbar bg-base-200">
         <div className="navbar-start">
-          <div className="dropdown">
+          <Image
+            src="/images/img.png"
+            width={500}
+            height={500}
+            alt="Picture of the author"
+          />
+          {/* <div className="dropdown">
             <div
               tabIndex={0}
               role="button"
               className="btn btn-ghost lg:hidden"
             ></div>
-          </div>
-          <Link href="/home" className="btn btn-ghost text-xl">
+          </div> */}
+          <Link href="/home" className="btn text-xl ml-28  ">
             Home
           </Link>
+          <Link href="/about" className="btn text-xl ml-8 ">
+            About
+          </Link>
+          <button onClick={handleLogout} className="btn ml-96">
+            Connect Meta Mask
+          </button>
         </div>
         {users ? (
           <div className="navbar-end">
